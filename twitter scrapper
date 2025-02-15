@@ -1,0 +1,27 @@
+import asyncio
+from twscrape import API, gather
+from twscrape.logger import set_log_level
+
+async def main():
+    api = API()  # Initialize API
+    await api.pool.login_all()  # Login to accounts
+
+    # Define search query and parameters
+    query = "data science OR artificial intelligence OR machine learning"
+    start_date = "2025-01-01"
+    end_date = "2025-02-16"
+    limit = 50
+
+    # Fetch tweets sorted by engagement (likes + retweets)
+    tweets = await gather(api.search(query, limit=limit, kv={"since": start_date, "until": end_date, "sort": "popular"}))
+
+    # Extract tweet details
+    for tweet in tweets:
+        print(f"Handle: @{tweet.user.username}")
+        print(f"Tweet Link: https://twitter.com/{tweet.user.username}/status/{tweet.id}")
+        print(f"Content: {tweet.rawContent}")
+        print(f"Likes: {tweet.likeCount}, Retweets: {tweet.retweetCount}")
+        print("-" * 50)
+
+if __name__ == "__main__":
+    asyncio.run(main())
